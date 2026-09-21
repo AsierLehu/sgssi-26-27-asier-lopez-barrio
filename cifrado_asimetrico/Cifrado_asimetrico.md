@@ -290,13 +290,75 @@ Es importante que seáis capaces de usar vuestras claves en otros equipos, sobre
 
 > ¿Cómo se exporta una clave GPG para poder usarla en otro equipo?
 
+### Exportar claves GPG para usar en otro equipo:
+
+#### **1. Exportar clave privada y pública**
+```bash
+# Exportar clave privada (mantener segura)
+gpg --export-secret-keys --armor email@gmail.com > mi_clave_privada.asc
+# Exportar clave pública (para compartir)
+gpg --export --armor email@gmail.com > mi_clave_publica.asc
+```
+Se queda tal cual en un archivo como el público pero con la privada
+#### **2. En el equipo destino: Importar claves**
+```bash
+# Importar clave privada
+gpg --import mi_clave_privada.asc
+
+# Importar clave pública (si es necesaria)
+gpg --import mi_clave_publica.asc
+
+# Establecer confianza en tu propia clave
+gpg --edit-key tu@email.com
+```
+# Luego sale como una terminal en la que pones trust, y ahí le asignas un nivel de confianza. He hecho la prueba con la que ya tenía y ya estaba en el ultimate, pero bueno.
+
 Puede pasar que una clave quede comprometida.
 
 > ¿Cómo revocarías tu clave?
 
+### Revocar una clave GPG comprometida:
+#### **1. Crear certificado de revocación (si no lo tienes)**
+```bash
+# Generar certificado de revocación
+gpg --gen-revoke tu@email.com > revoke_cert.asc
+
+# Importar la revocación
+gpg --import revoke_cert.asc
+
+# Publicar en servidor de claves - aquí va el ID de la clave que ha sido expuesta
+gpg --send-keys TU_KEY_ID
+```
+**Importante**: Una vez revocada, la clave no se puede "des-revocar". Crear nueva clave si es necesario.
+
 Aunque su función principal es el cifrado asimétrico, GPG también se puede usar para cifrado simétrico.
 
 > ¿Como cifrarías este documento de manera simétrica, y qué pasos seguirías para que el receptor lo descifre?
+
+### Cifrado simétrico con GPG:
+
+Aunque GPG es conocido principalmente por el cifrado asimétrico (claves pública/privada), también puede funcionar como una herramienta de cifrado simétrico tradicional. En este modo, GPG usa una **única contraseña compartida** entre emisor y receptor, similar a herramientas como OpenSSL o 7-Zip. Es útil cuando quieres cifrar archivos rápidamente sin la complejidad de gestionar pares de claves, especialmente para archivos grandes o cuando ya tienes un canal seguro para intercambiar la contraseña.
+#### **1. Cifrar el documento con contraseña**
+```bash
+# Cifrado simétrico (solo con contraseña, sin claves)
+gpg --symmetric documento.md
+# Se genera documento.md.gpg
+# Se puede especificar algoritmo
+gpg --cipher-algo AES256 --armor --symmetric documento.md
+# se genera un .asc
+```
+
+#### **2. Pasos para el receptor**
+```bash
+# Descifrar el archivo
+gpg --decrypt documento.md.gpg > documento_descifrado.md
+# Introducir la misma contraseña usada para cifrar
+```
+
+No me ha pedido contraseña, se ve que se ha guardado en el caché del agente gpg
+Si lo intentaramos abrir en otro ordenador supongo que sí me pediría 
+
+**Diferencia clave**: En cifrado simétrico ambos usan la misma contraseña, en asimétrico cada uno tiene su par de claves público/privado.
 
 ## RSA
 
@@ -310,13 +372,39 @@ El archivo `clave.pem` tiene ambas claves, para poder ver su estructura interna:
 ```bash
 openssl rsa -text -in clave.pem
 ```
+Se ve como un bloque de modulus, exponente y primos, y al final la clave privada
 
-Para extraer la clave pública:
+Para extraer la clave pública a un archivo:
 
 ```bash
 openssl rsa -pubout -in clave.pem -out clave_publica.pem
 ```
 
-Encripta un mensaje con la clave publica mediante `openssl pkeyutl -encrypt`. Descífralo con la clave privada y comprueba que el mensaje coincide. 
+Encripta un mensaje con la clave publica mediante `openssl pkeyutl -encrypt`. Descífralo con la clave privada y comprueba que el mensaje coincide.
+
+### Pasos para cifrar/descifrar con RSA usando OpenSSL:
+
+#### **1. Crear mensaje de prueba**
+```bash
+echo "Mensaje secreto para cifrar con RSA" > mensaje.txt
+```
+
+#### **2. Cifrar con clave pública**
+```bash
+openssl pkeyutl -encrypt -pubin -inkey clave_publica.pem -in mensaje.txt -out mensaje_cifrado.bin
+```
+-pubin: Indica que el archivo de clave de entrada es una clave pública
+-inkey clave_publica.pem: Archivo de entrada, la clave pública en formato PEM
+
+
+#### **3. Descifrar con clave privada**
+```bash
+openssl pkeyutl -decrypt -inkey clave.pem -in mensaje_cifrado.bin -out mensaje_descifrado.txt
+```
+clave.pem: tomamos la clave pública
+
+cat mensaje_descifrado.txt
+
+**Nota**: RSA solo puede cifrar datos del tamaño de la clave menos padding (~245 bytes para RSA-2048). 
 
 > RSA sirve para archivos pequeños. ¿Cómo implementarías un cifrado híbrido, usando AES para cifrar el archivo de manera simétrica y RSA para cifrar la clave AES? 
