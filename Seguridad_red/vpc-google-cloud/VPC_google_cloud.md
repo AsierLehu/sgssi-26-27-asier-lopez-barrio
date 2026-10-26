@@ -82,6 +82,14 @@ sudo chown www-data:www-data index.py
 Crear la instancia. Visitar `http://IP_EXTERNA_SERVIDOR_WEB/cgi-bin/index.py` y debería aparecer el siguiente error, ya que no se puede conectar a la BBDD: `Database error: (2003, "Can't connect to MySQL server on 'DB_PRIVATE_IP' ([Errno -3] Temporary failure in name resolution)")`
 
 
+### Comentario:
+Todo me ha ido bien. Tarda un poco
+
+![Error de agenda](agenda%20error.png)
+
+
+
+
 ## Crear la base de datos (Cloud SQL)
 
 Ir a `Cloud SQL` > `Instances` > `Create free instance` (Cloud SQL gratis durante 30 dias) > `MySQL`:
@@ -112,6 +120,26 @@ USERNAME = "admin"
 PASSWORD = "DB_PASSWORD"
 DATABASE = "mydb"
 ```
+
+### Pasos para hacer esto
+
+1- Nos conectamos por ssh a phonebook-web
+
+2- El script que hemos puesto antes de arranque hace cd /usr/lib/cgi-bin/ y copia ahí el index.py. Así que:
+bash
+```
+sudo nano /usr/lib/cgi-bin/index.py
+```
+
+Ahí ponemos la contraseña y la IP privada de la Sql Instance
+
+
+### Error que me ha dado:
+Me saltaba todo el rato en la web esto:
+Database error: (1045, "Access denied for user 'admin'@'10.0.1.2' (using password: YES)")
+
+En la parte de editar y de security lo he dejado así:
+![Solucion](solucionaerrordeaccesodenegado.png)
 
 ## Probar la aplicación
 
