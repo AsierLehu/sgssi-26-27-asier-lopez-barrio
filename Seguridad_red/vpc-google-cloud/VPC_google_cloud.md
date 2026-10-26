@@ -133,6 +133,13 @@ sudo nano /usr/lib/cgi-bin/index.py
 
 Ahí ponemos la contraseña y la IP privada de la Sql Instance
 
+3- En esa IP privada hay que crear la base y ejecutar `addressbook.sql`, porque el enunciado no lo dice y sin la tabla `address` la página no muestra contactos. Desde la conexión SSL de `phonebook-web` se puede hacer:
+
+```bash
+mysql -h IP_PRIVADA -u admin -p -e "CREATE DATABASE IF NOT EXISTS mydb;"
+mysql -h IP_PRIVADA -u admin -p mydb < addressbook.sql
+```
+
 
 ### Error que me ha dado:
 Me saltaba todo el rato en la web esto:
