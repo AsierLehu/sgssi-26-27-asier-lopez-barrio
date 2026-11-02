@@ -111,10 +111,20 @@ Configuración:
 Pulsar `Create`. La puesta en marcha del balanceador puede tardar varios minutos.
 
 ## Probar el balanceador
+lb-ip creo que es 8.233.156.247:80
+Visitar `http://8.233.156.247:80` (la IP `lb-ip`) y recargar la página varias veces (o ejecutar `for i in $(seq 1 20); do curl -s http://8.233.156.247:80; done`). Debería aparecer el nombre de las distintas instancias del grupo. 
 
-Visitar `http://IP_BALANCEADOR` (la IP `lb-ip`) y recargar la página varias veces (o ejecutar `for i in $(seq 1 20); do curl -s http://IP_BALANCEADOR; done`). Debería aparecer el nombre de las distintas instancias del grupo.
+Tras un buen rato me ha ido correctamente:
+<h1>Servidor: lb-mig-g3kq</h1>
+<h1>Servidor: lb-mig-mnjg</h1>
+<h1>Servidor: lb-mig-mnjg</h1>
+<h1>Servidor: lb-mig-mnjg</h1>
+<h1>Servidor: lb-mig-g3kq</h1>
+<h1>Servidor: lb-mig-mnjg</h1>
+<h1>Servidor: lb-mig-g3kq</h1>
+..............
 
-## Probar la tolerancia a fallos
+## Probar la tolerancia a fallos - NO HECHO
 
 1. Conectarse por SSH a una de las instancias y detener Apache: `sudo systemctl stop apache2`.
 2. Tras unos segundos la comprobación de salud marcará la instancia como no saludable (`Load balancing` > `lb-http` > `Backends`).

@@ -135,14 +135,33 @@ Crear la instancia. Visitar `http://IP_EXTERNA_PROXY` y debería aparecer la pá
 1. Desde el equipo local, comprobar las cabeceras añadidas por Squid y la caché (repetir el comando dos veces):
 
 ```bash
-curl -I http://IP_EXTERNA_PROXY
+curl -I http://34.118.83.35/
+HTTP/1.1 200 OK
+.....
 ```
 
-   Deben aparecer las cabeceras `Via` y `X-Cache`. En la primera petición `X-Cache: MISS`, y en las siguientes `X-Cache: HIT`, lo que indica que el proxy responde sin consultar al backend.
+   Deben aparecer las cabeceras `Via` y `X-Cache`. En la primera petición `X-Cache: MISS`, y en las siguientes `X-Cache: HIT`, lo que indica que el proxy responde sin consultar al backend. 
+
+Yo solo he conseguido ver en Via y Cache-Status que sale hit.
 
 2. Comprobar que el backend no es accesible directamente: no tiene IP externa, y `curl http://10.0.2.10` solo funciona desde `proxy-web`.
+
+Efectivamente, no va.
+
 3. Conectarse por SSH a `proxy-web` y consultar el registro de Squid: `sudo tail /var/log/squid/access.log`. Se verán las peticiones con `TCP_MISS` y `TCP_HIT`/`TCP_MEM_HIT`.
+
+ssh alopez572@34.118.83.35 
+sudo tail /var/log/squid/access.log
+
+Sí, se ve todo correctamente.
+
 4. Desde `proxy-web`, conectarse por SSH a `backend-web` (`ssh USUARIO@10.0.2.10`, con reenvío de agente `ssh -A`) y consultar `sudo tail /var/log/apache2/access.log`: solo aparece la IP del proxy (`10.0.1.x`) como cliente, y las peticiones en caché no llegan.
+
+Para poder hacerlo he tenido que hacer exit, volver a conectarme a proxy con el -A y luego desde ahi el ssh hacia la IP interna.
+
+10.0.1.2 - - [02/Nov/2026:15:20:55 +0000] "GET /squid-internal-periodic/store_digest HTTP/1.1" 404 528 "-" "-"
+
+
 
 ## Limpieza
 

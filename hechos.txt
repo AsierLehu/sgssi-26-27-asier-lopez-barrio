@@ -1,8 +1,9 @@
 Tor Onion - SI
 Wireshark - SI
-VPC Google Cloud
-Firewall
-NMap
-Load Balancer
+VPC Google Cloud - SI
+Firewall - A MEDIAS
+NMap - SI
+Load Balancer - A MEDIAS
 Reverse Proxy
 Suricata
+Pentesting ZAP 
