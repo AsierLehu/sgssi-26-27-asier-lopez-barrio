@@ -71,12 +71,14 @@ sudo suricata-update
 
 > ¿Cuántas reglas se han descargado? (Pista: el propio comando lo indica al finalizar).
 
+Loaded 69328 rules.
+
 ## Ejecutar Suricata
 
 Lanzar Suricata en primer plano sobre la interfaz elegida, para ver los mensajes de arranque:
 
 ```bash
-sudo suricata -c /etc/suricata/suricata.yaml -i eth0
+sudo suricata -c /etc/suricata/suricata.yaml -i wlxccbabdb52bf4
 ```
 
 Si no hay errores, dejar este proceso corriendo y abrir otra terminal (otra sesión SSH si es Google Cloud) para el resto de la práctica. También se puede lanzar como servicio en segundo plano:
@@ -101,6 +103,8 @@ sudo tail -n 20 /var/log/suricata/fast.log
 
 Debería aparecer una línea con una alerta de tipo `GPL ATTACK_RESPONSE id check returned root`, indicando que Suricata ha detectado la respuesta característica de `testmyids.com`.
 
+Me ha aparecido
+
 También se puede consultar el registro en formato JSON, más completo. Instalar `jq` para filtrar el JSON cómodamente:
 
 ```bash
@@ -109,6 +113,9 @@ sudo tail -n 5 /var/log/suricata/eve.json | jq 'select(.event_type=="alert")'
 ```
 
 > ¿Qué campos aparecen en el evento de tipo `alert` del fichero `eve.json`? ¿Qué información aportan `signature`, `severity` y `src_ip`/`dest_ip` frente al mensaje de `fast.log`?
+
+signature explica qué amenaza se ha detectado; severity indica su importancia; y src_ip/dest_ip muestran quién origina y recibe el tráfico.
+
 
 Probar ahora con un escaneo de puertos, instalando `nmap` si no está disponible:
 

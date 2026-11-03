@@ -3,7 +3,7 @@ Wireshark - SI
 VPC Google Cloud - SI
 Firewall - A MEDIAS
 NMap - SI
-Load Balancer - A MEDIAS
+Load Balancer - SI
 Reverse Proxy
-Suricata
+Suricata - A MEDIAS
 Pentesting ZAP 
