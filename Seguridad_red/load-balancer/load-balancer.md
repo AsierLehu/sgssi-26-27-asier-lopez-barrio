@@ -115,6 +115,7 @@ lb-ip creo que es 8.233.156.247:80
 Visitar `http://8.233.156.247:80` (la IP `lb-ip`) y recargar la página varias veces (o ejecutar `for i in $(seq 1 20); do curl -s http://8.233.156.247:80; done`). Debería aparecer el nombre de las distintas instancias del grupo. 
 
 Tras un buen rato me ha ido correctamente:
+```
 <h1>Servidor: lb-mig-g3kq</h1>
 <h1>Servidor: lb-mig-mnjg</h1>
 <h1>Servidor: lb-mig-mnjg</h1>
@@ -122,7 +123,7 @@ Tras un buen rato me ha ido correctamente:
 <h1>Servidor: lb-mig-g3kq</h1>
 <h1>Servidor: lb-mig-mnjg</h1>
 <h1>Servidor: lb-mig-g3kq</h1>
-..............
+```
 
 ## Probar la tolerancia a fallos - NO HECHO
 
