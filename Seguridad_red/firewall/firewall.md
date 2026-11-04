@@ -115,13 +115,13 @@ El resto de IPs no coinciden con esa regla y siguen usando la de permitir. Desde
 Para evitar tener que introducir una y otra vez las mismas reglas, se pueden guardar en un fichero mediante el siguiente comando:
 
 ```bash
-sudo iptables-save > /home/user/fichero
+sudo iptables-save > /home/asier/fichero
 ```
 
 Tras reiniciar la máquina, se pueden recuperar mediante:
 
 ```bash
-sudo iptables-restore < /home/user/fichero
+sudo iptables-restore < /home/asier/fichero
 ```
 
 Si quisiéramos que la restauración de reglas se hiciera de manera automática cada vez que se reiniciara el sistema, podríamos crear un script que se ejecutara al iniciar la máquina o modificar la configuración de red para que, al configurar las conexiones, se restauraran automáticamente las reglas de IPTables.
@@ -132,12 +132,21 @@ Definid las reglas necesarias para conseguir lo siguiente:
 
 **Solución:** En ambos casos se necesita la IP de origen que ve el servidor: la IP pública del otro servidor y la IP pública de nuestra máquina local (si esta sale a Internet a través de un router, será la IP pública del router). Sustituid los valores de ejemplo por esas IP. Insertad las reglas antes de las reglas generales de `INPUT` y mantened abierta la sesión SSH actual mientras comprobáis una segunda conexión:
 
+
+curl -4 https://ifconfig.me para obtener la IP de mi máquina local
+
 ```bash
+# Crea una cadena independiente para filtrar las conexiones SSH.
 sudo iptables -N SSH_FILTER
+# Permite el tráfico de conexiones ya establecidas o relacionadas.
 sudo iptables -A SSH_FILTER -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+# Permite nuevas conexiones SSH desde el otro servidor autorizado.
 sudo iptables -A SSH_FILTER -s IP_PUBLICA_OTRO_SERVIDOR/32 -p tcp --dport 22 -j ACCEPT
+# Permite nuevas conexiones SSH desde la máquina local autorizada.
 sudo iptables -A SSH_FILTER -s IP_PUBLICA_MAQUINA_LOCAL/32 -p tcp --dport 22 -j ACCEPT
+# Bloquea el resto de conexiones TCP dirigidas al puerto SSH (22).
 sudo iptables -A SSH_FILTER -p tcp --dport 22 -j DROP
+# Aplica el filtro al tráfico SSH antes que las reglas generales de INPUT.
 sudo iptables -I INPUT 1 -p tcp --dport 22 -j SSH_FILTER
 ```
 
