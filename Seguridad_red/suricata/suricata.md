@@ -126,7 +126,19 @@ nmap -sS localhost
 
 > Vuelve a consultar `fast.log` y `eve.json`. ¿Ha generado alertas el escaneo? ¿Qué firma(s) han saltado?
 
+Sí, si las reglas de detección de escaneos están cargadas y Suricata está
+capturando la interfaz correcta, el escaneo puede generar una o varias
+alertas en ambos ficheros. En `fast.log` se ve el mensaje resumido; en
+`eve.json` aparece además el protocolo, los puertos, las direcciones
+`src_ip`/`dest_ip`, la firma y su clasificación. 
+
 > Cambia `HOME_NET` en `suricata.yaml` a un valor distinto (por ejemplo `[10.0.0.0/8]` en vez de `any`), reinicia Suricata (`sudo systemctl restart suricata`) y repite la prueba con `curl http://testmyids.com`. ¿Cambia el resultado? ¿Por qué `HOME_NET` afecta a qué tráfico se considera "entrante" o "saliente" en las reglas?
+
+Con `HOME_NET: any`, la dirección local queda incluida en la red protegida,
+por lo que la respuesta de `testmyids.com` se clasifica normalmente como
+tráfico entrante (`$EXTERNAL_NET -> $HOME_NET`) y vuelve a aparecer la alerta
+`GPL ATTACK_RESPONSE id check returned root`. Si se cambia a
+`[10.0.0.0/8]` y la máquina no tiene una dirección `10.x.x.x`, su dirección local deja de pertenecer a `HOME_NET`. En ese caso la respuesta externa ya no coincide con las reglas que esperan tráfico hacia `$HOME_NET` y la alerta puede desaparecer. Si la máquina sí utiliza una dirección `10.x.x.x`, el resultado debería mantenerse.
 
 ## Limpieza
 
